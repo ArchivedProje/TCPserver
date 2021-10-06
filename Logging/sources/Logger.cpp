@@ -1,12 +1,11 @@
+// Copyright 2021 byteihq <kotov038@gmail.com>
 
 #include <Logger.h>
 #include <ios>
 #include <chrono>
 #include <iomanip>
 
-Logger::Logger(const std::string &filename) {
-    file_.open(filename, std::ios::app);
-}
+std::ofstream Logger::file_ = std::ofstream("log/mainLog.log", std::ios::app);
 
 void Logger::log(const std::string &msg, const std::string &fileName, size_t lineNumber) {
     const char *time_param = "%T";

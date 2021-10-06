@@ -6,7 +6,6 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <Logger.h>
 
 using boost::asio::ip::tcp;
 
@@ -15,13 +14,12 @@ private:
     std::shared_ptr<tcp::socket> socket_;
     boost::asio::ip::address ip_;
     boost::asio::streambuf data_;
-    Logger& logger_;
 public:
     using pointer = boost::shared_ptr<HandleConnection>;
 
-    explicit HandleConnection(boost::asio::io_service &io_service, Logger& logger);
+    explicit HandleConnection(boost::asio::io_service &io_service);
 
-    static pointer create(boost::asio::io_service &io_service, Logger& logger);
+    static pointer create(boost::asio::io_service &io_service);
 
     void start();
 

@@ -1,18 +1,17 @@
-#include <iostream>
 #include <Server.h>
 #include <Logger.h>
+#include <memory>
 
 int main() {
     try {
-        Logger logger("log/mainLog.log");
-        logger.log("Creating ioService", __FILE__, __LINE__);
-        boost::asio::io_service ioService;
-        logger.log("ioService succesfully created", __FILE__, __LINE__);
-        Server server(ioService, logger);
-        ioService.run();
+        Logger::log("Creating ioService", __FILE__, __LINE__);
+        std::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service);
+        Logger::log("ioService succesfully created", __FILE__, __LINE__);
+        Server server(ioService);
+        ioService->run();
     }
     catch (std::exception &e) {
-        std::cerr << e.what() << std::endl;
+        Logger::log(e.what(), __FILE__, __LINE__);
     }
     return 0;
 }
