@@ -31,7 +31,7 @@ target_include_directories(Logging PUBLIC
         $<INSTALL_INTERFACE:include>
         )
 
-file(COPY Logging/log DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Logging/log DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(RequestHandling STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/RequestHandling/sources/RequestHandler.cpp
@@ -41,6 +41,8 @@ target_include_directories(RequestHandling PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/RequestHandling/include>
         $<INSTALL_INTERFACE:include>
         )
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Python DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 hunter_add_package(nlohmann_json)
 find_package(nlohmann_json REQUIRED)

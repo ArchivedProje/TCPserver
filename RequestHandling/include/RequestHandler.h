@@ -6,6 +6,8 @@
 #include <string>
 
 class RequestHadler {
+private:
+    static std::string exec(const char *cmd);
 public:
     static std::string handle(const std::string& request);
 };

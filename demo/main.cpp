@@ -3,6 +3,8 @@
 #include <memory>
 
 int main() {
+    exec("python3 Python/MYSQLmain.py AUTH user1 1u23456");
+
     try {
         Logger::log("Creating ioService", __FILE__, __LINE__);
         std::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service);
