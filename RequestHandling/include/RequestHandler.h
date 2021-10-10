@@ -4,12 +4,13 @@
 #define TCPSERVER_REQUESTHANDLER_H
 
 #include <string>
+#include <nlohmann/json.hpp>
 
 class RequestHadler {
 private:
     static std::string exec(const char *cmd);
 public:
-    static std::string handle(const std::string& request);
+    static nlohmann::json handle(const std::string& request);
 };
 
 #endif //TCPSERVER_REQUESTHANDLER_H

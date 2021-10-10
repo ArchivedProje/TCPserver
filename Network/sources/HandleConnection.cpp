@@ -22,7 +22,7 @@ void HandleConnection::getMessage() {
                                           std::getline(ss, sData);
                                           Logger::log("Message - " + sData, __FILE__, __LINE__);
                                           Logger::log("Handling new message", __FILE__, __LINE__);
-                                          RequestHadler::handle(sData);
+                                          sendMessage(RequestHadler::handle(sData).dump());
                                       } else {
                                           Logger::log("Error receiving message", __FILE__, __LINE__);
                                       }
@@ -34,8 +34,10 @@ void HandleConnection::sendMessage(const std::string &msg) {
     boost::asio::async_write(*socket_, boost::asio::buffer(msg + '\n', msg.size() + 1),
                              [this, self, msg](boost::system::error_code ec, std::size_t /*length*/) {
                                  if (!ec) {
+                                     Logger::log("Message successfully sent", __FILE__, __LINE__);
                                      getMessage();
                                  } else {
+                                     Logger::log("Failed send message", __FILE__, __LINE__);
                                  }
                              });
 }

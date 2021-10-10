@@ -1,7 +1,7 @@
 // Copyright 2021 byteihq <kotov038@gmail.com>
 
 #include <RequestHandler.h>
-#include <nlohmann/json.hpp>
+#include <NetworkCommunication.h>
 
 std::string RequestHadler::exec(const char *cmd) {
     char buffer[128];
@@ -11,21 +11,41 @@ std::string RequestHadler::exec(const char *cmd) {
     try {
         while (fgets(buffer, sizeof buffer, pipe) != NULL)
             result += buffer;
-    }
-    catch (...) {
+    } catch (...) {
         pclose(pipe);
         throw;
     }
 
     pclose(pipe);
+    result.erase(result.end() - 1);
     return result;
 }
 
-std::string RequestHadler::handle(const std::string &request) {
+nlohmann::json RequestHadler::handle(const std::string &request) {
     nlohmann::json jsonRequest = nlohmann::json::parse(request);
-    if (jsonRequest["type"] == "auth") {
-        // working with db
-        RequestHadler::exec("hellp");
+    nlohmann::json reply;
+    if (jsonRequest["type"] == Requests::Auth) {
+        std::string cmd = "python3 Python/MYSQLmain.py AUTH " + jsonRequest["data"]["login"].get<std::string>() + " " +
+                          jsonRequest["data"]["password"].get<std::string>();
+        if (RequestHadler::exec(cmd.c_str()) == "True") {
+            reply = {
+                    {"sender", "server"},
+                    {"type",   Requests::Auth},
+                    {"data",   Replies::Auth::Successful}
+            };
+        } else {
+            reply = {
+                    {"sender", "server"},
+                    {"type",   Requests::Auth},
+                    {"data",   Replies::Auth::Unsuccessful}
+            };
+        }
+    } else {
+        reply = {
+                {"sender", "server"},
+                {"type",   Requests::Unknown},
+                {"data",   Replies::Unknown::Unknown}
+        };
     }
-    return std::string();
+    return reply;
 }

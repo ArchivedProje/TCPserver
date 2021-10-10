@@ -22,16 +22,11 @@ target_include_directories(Network PUBLIC
         $<INSTALL_INTERFACE:include>
         )
 
-add_library(Logging STATIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/Logging/sources/Logger.cpp
-        )
+add_subdirectory(third-party/Logger)
 
-target_include_directories(Logging PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Logging/include>
-        $<INSTALL_INTERFACE:include>
-        )
+add_subdirectory(third-party/NetworkCommunication)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Logging/log DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/log DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(RequestHandling STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/RequestHandling/sources/RequestHandler.cpp
@@ -50,9 +45,9 @@ find_package(nlohmann_json REQUIRED)
 hunter_add_package(Boost COMPONENTS system)
 find_package(Boost COMPONENTS system REQUIRED)
 
-target_link_libraries(RequestHandling nlohmann_json::nlohmann_json)
+target_link_libraries(RequestHandling NetworkCommunication nlohmann_json::nlohmann_json)
 
-target_link_libraries(Network Logging RequestHandling Boost::system)
+target_link_libraries(Network Logger RequestHandling Boost::system)
 
 add_executable(demo demo/main.cpp)
 
