@@ -6,7 +6,7 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-class RequestHadler {
+class RequestHandler {
 private:
     static std::string exec(const char *cmd);
 public:

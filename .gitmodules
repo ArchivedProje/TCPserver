@@ -4,3 +4,6 @@
 [submodule "third-party/NetworkCommunication"]
 	path = third-party/NetworkCommunication
 	url = https://github.com/byteihq/NetworkCommunication
+[submodule "third-party/Logger"]
+	path = third-party/Logger
+	url = https://github.com/byteihq/Logger

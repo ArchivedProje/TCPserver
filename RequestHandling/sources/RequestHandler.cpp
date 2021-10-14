@@ -2,8 +2,9 @@
 
 #include <RequestHandler.h>
 #include <NetworkCommunication.h>
+#include <iostream>
 
-std::string RequestHadler::exec(const char *cmd) {
+std::string RequestHandler::exec(const char *cmd) {
     char buffer[128];
     std::string result;
     FILE *pipe = popen(cmd, "r");
@@ -21,13 +22,13 @@ std::string RequestHadler::exec(const char *cmd) {
     return result;
 }
 
-nlohmann::json RequestHadler::handle(const std::string &request) {
+nlohmann::json RequestHandler::handle(const std::string &request) {
     nlohmann::json jsonRequest = nlohmann::json::parse(request);
     nlohmann::json reply;
     if (jsonRequest["type"] == Requests::Auth) {
         std::string cmd = "python3 Python/MYSQLmain.py AUTH " + jsonRequest["data"]["login"].get<std::string>() + " " +
                           jsonRequest["data"]["password"].get<std::string>();
-        if (RequestHadler::exec(cmd.c_str()) == "True") {
+        if (RequestHandler::exec(cmd.c_str()) == "True") {
             reply = {
                     {"sender", "server"},
                     {"type",   Requests::Auth},

@@ -8,6 +8,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 using boost::asio::ip::tcp;
+static std::vector<std::weak_ptr<int>> v;
 
 class HandleConnection : public boost::enable_shared_from_this<HandleConnection> {
 private:
