@@ -1,7 +1,6 @@
 // Copyright 2021 byteihq <kotov038@gmail.com>
 
 #include <RequestHandler.h>
-#include <NetworkCommunication.h>
 #include <Logger.h>
 
 std::string RequestHandler::exec(const char *cmd) {
@@ -22,7 +21,7 @@ std::string RequestHandler::exec(const char *cmd) {
     return result;
 }
 
-nlohmann::json RequestHandler::handle(const std::string &request, bool& connected) {
+std::pair<Requests, nlohmann::json> RequestHandler::handle(const std::string &request) {
     nlohmann::json jsonRequest = nlohmann::json::parse(request);
     nlohmann::json reply;
     if (jsonRequest["type"] == Requests::Auth) {
@@ -44,7 +43,7 @@ nlohmann::json RequestHandler::handle(const std::string &request, bool& connecte
     } else if (jsonRequest["type"] == Requests::Msg) {
         Logger::log("New message from " + jsonRequest["sender"].get<std::string>() + " Message: " + jsonRequest["data"].get<std::string>(), __FILE__, __LINE__);
     } else if (jsonRequest["type"] == Requests::Disconnect) {
-        connected = false;
+        Logger::log("Person disconnected", __FILE__, __LINE__);
     } else {
         reply = {
                 {"sender", "server"},
@@ -52,5 +51,5 @@ nlohmann::json RequestHandler::handle(const std::string &request, bool& connecte
                 {"data",   Replies::Unknown::Unknown}
         };
     }
-    return reply;
+    return {jsonRequest["type"], reply};
 }

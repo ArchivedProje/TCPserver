@@ -28,6 +28,8 @@ public:
 
     void sendMessage(const std::string &msg);
 
+    void sendMessage(const std::shared_ptr<tcp::socket>& socket, const std::string& msg);
+
     void getMessage();
 
     std::shared_ptr<tcp::socket> getSocket() const;

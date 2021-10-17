@@ -3,6 +3,7 @@
 #include <HandleConnection.h>
 #include <RequestHandler.h>
 #include <Logger.h>
+#include <nlohmann/json.hpp>
 #include <algorithm>
 
 HandleConnection::HandleConnection(boost::asio::io_service &io_service) : socket_(
@@ -24,12 +25,17 @@ void HandleConnection::getMessage() {
                                           if (sData != "\"null\"") {
                                               Logger::log("Message - " + sData, __FILE__, __LINE__);
                                               Logger::log("Handling new message", __FILE__, __LINE__);
-                                              bool connected = true;
-                                              auto res = RequestHandler::handle(sData, connected).dump();
-                                              if (connected) {
-                                                  sendMessage(res);
-                                              } else {
+                                              auto res = RequestHandler::handle(sData);
+                                              if (res.first == Requests::Disconnect) {
                                                   usersSockets_.erase(std::find(usersSockets_.begin(), usersSockets_.end(), socket_));
+                                              } else if (res.first == Requests::Msg) {
+                                                  for (const auto& socket : usersSockets_) {
+                                                      if (socket != socket_) {
+                                                          sendMessage(socket, res.second.dump());
+                                                      }
+                                                  }
+                                              } else {
+                                                  sendMessage(res.second.dump());
                                               }
                                           } else {
                                               getMessage();
@@ -42,16 +48,8 @@ void HandleConnection::getMessage() {
 }
 
 void HandleConnection::sendMessage(const std::string &msg) {
-    auto self(shared_from_this());
-    boost::asio::async_write(*socket_, boost::asio::buffer(msg + '\n', msg.size() + 1),
-                             [this, self, msg](boost::system::error_code ec, std::size_t /*length*/) {
-                                 if (!ec) {
-                                     Logger::log("Message successfully sent", __FILE__, __LINE__);
-                                     getMessage();
-                                 } else {
-                                     Logger::log("Failed send message", __FILE__, __LINE__);
-                                 }
-                             });
+    sendMessage(socket_, msg);
+    getMessage();
 }
 
 void HandleConnection::start() {
@@ -63,4 +61,16 @@ void HandleConnection::start() {
 
 std::shared_ptr<tcp::socket> HandleConnection::getSocket() const {
     return socket_;
+}
+
+void HandleConnection::sendMessage(const std::shared_ptr<tcp::socket>& socket, const std::string &msg) {
+    auto self(shared_from_this());
+    boost::asio::async_write(*socket_, boost::asio::buffer(msg + '\n', msg.size() + 1),
+                             [this, self, msg](boost::system::error_code ec, std::size_t /*length*/) {
+                                 if (!ec) {
+                                     Logger::log("Message successfully sent", __FILE__, __LINE__);
+                                 } else {
+                                     Logger::log("Failed send message", __FILE__, __LINE__);
+                                 }
+                             });
 }
