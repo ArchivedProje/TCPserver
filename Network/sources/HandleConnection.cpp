@@ -3,7 +3,6 @@
 #include <HandleConnection.h>
 #include <RequestHandler.h>
 #include <Logger.h>
-#include <iostream>
 
 HandleConnection::HandleConnection(boost::asio::io_service &io_service) : socket_(
         std::make_shared<tcp::socket>(io_service)) {}
@@ -21,9 +20,13 @@ void HandleConnection::getMessage() {
                                           std::istream ss(&data_);
                                           std::string sData;
                                           std::getline(ss, sData);
-                                          Logger::log("Message - " + sData, __FILE__, __LINE__);
-                                          Logger::log("Handling new message", __FILE__, __LINE__);
-                                          sendMessage(RequestHandler::handle(sData).dump());
+                                          if (sData != "\"null\"") {
+                                              Logger::log("Message - " + sData, __FILE__, __LINE__);
+                                              Logger::log("Handling new message", __FILE__, __LINE__);
+                                              sendMessage(RequestHandler::handle(sData).dump());
+                                          } else {
+                                              getMessage();
+                                          }
                                       } else {
                                           Logger::log("Error receiving message", __FILE__, __LINE__);
                                       }

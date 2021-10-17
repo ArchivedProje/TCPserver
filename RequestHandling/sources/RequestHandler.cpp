@@ -2,7 +2,7 @@
 
 #include <RequestHandler.h>
 #include <NetworkCommunication.h>
-#include <iostream>
+#include <Logger.h>
 
 std::string RequestHandler::exec(const char *cmd) {
     char buffer[128];
@@ -41,6 +41,8 @@ nlohmann::json RequestHandler::handle(const std::string &request) {
                     {"data",   Replies::Auth::Unsuccessful}
             };
         }
+    } else if (jsonRequest["type"] == Requests::Msg) {
+        Logger::log("New message from " + jsonRequest["sender"].get<std::string>() + " Message: " + jsonRequest["data"].get<std::string>(), __FILE__, __LINE__);
     } else {
         reply = {
                 {"sender", "server"},

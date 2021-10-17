@@ -45,7 +45,7 @@ find_package(nlohmann_json REQUIRED)
 hunter_add_package(Boost COMPONENTS system)
 find_package(Boost COMPONENTS system REQUIRED)
 
-target_link_libraries(RequestHandling NetworkCommunication nlohmann_json::nlohmann_json)
+target_link_libraries(RequestHandling Logger NetworkCommunication nlohmann_json::nlohmann_json)
 
 target_link_libraries(Network Logger RequestHandling Boost::system)
 
