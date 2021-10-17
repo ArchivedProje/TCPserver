@@ -10,7 +10,7 @@ class RequestHandler {
 private:
     static std::string exec(const char *cmd);
 public:
-    static nlohmann::json handle(const std::string& request);
+    static nlohmann::json handle(const std::string& request, bool& connected);
 };
 
 #endif //TCPSERVER_REQUESTHANDLER_H

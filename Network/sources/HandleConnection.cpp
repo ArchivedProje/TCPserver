@@ -3,6 +3,7 @@
 #include <HandleConnection.h>
 #include <RequestHandler.h>
 #include <Logger.h>
+#include <algorithm>
 
 HandleConnection::HandleConnection(boost::asio::io_service &io_service) : socket_(
         std::make_shared<tcp::socket>(io_service)) {}
@@ -23,11 +24,18 @@ void HandleConnection::getMessage() {
                                           if (sData != "\"null\"") {
                                               Logger::log("Message - " + sData, __FILE__, __LINE__);
                                               Logger::log("Handling new message", __FILE__, __LINE__);
-                                              sendMessage(RequestHandler::handle(sData).dump());
+                                              bool connected = true;
+                                              auto res = RequestHandler::handle(sData, connected).dump();
+                                              if (connected) {
+                                                  sendMessage(res);
+                                              } else {
+                                                  usersSockets_.erase(std::find(usersSockets_.begin(), usersSockets_.end(), socket_));
+                                              }
                                           } else {
                                               getMessage();
                                           }
                                       } else {
+                                          usersSockets_.erase(std::find(usersSockets_.begin(), usersSockets_.end(), socket_));
                                           Logger::log("Error receiving message", __FILE__, __LINE__);
                                       }
                                   });
@@ -48,6 +56,7 @@ void HandleConnection::sendMessage(const std::string &msg) {
 
 void HandleConnection::start() {
     ip_ = socket_->remote_endpoint().address();
+    usersSockets_.push_back(socket_);
     Logger::log("New connection " + ip_.to_string(), __FILE__, __LINE__);
     getMessage();
 }

@@ -22,7 +22,7 @@ std::string RequestHandler::exec(const char *cmd) {
     return result;
 }
 
-nlohmann::json RequestHandler::handle(const std::string &request) {
+nlohmann::json RequestHandler::handle(const std::string &request, bool& connected) {
     nlohmann::json jsonRequest = nlohmann::json::parse(request);
     nlohmann::json reply;
     if (jsonRequest["type"] == Requests::Auth) {
@@ -43,6 +43,8 @@ nlohmann::json RequestHandler::handle(const std::string &request) {
         }
     } else if (jsonRequest["type"] == Requests::Msg) {
         Logger::log("New message from " + jsonRequest["sender"].get<std::string>() + " Message: " + jsonRequest["data"].get<std::string>(), __FILE__, __LINE__);
+    } else if (jsonRequest["type"] == Requests::Disconnect) {
+        connected = false;
     } else {
         reply = {
                 {"sender", "server"},
