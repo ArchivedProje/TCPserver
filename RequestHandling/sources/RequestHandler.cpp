@@ -21,7 +21,7 @@ std::string RequestHandler::exec(const char *cmd) {
     return result;
 }
 
-std::pair<Requests, nlohmann::json> RequestHandler::handle(const std::string &request) {
+std::pair<nlohmann::json, nlohmann::json> RequestHandler::handle(const std::string &request) {
     nlohmann::json jsonRequest = nlohmann::json::parse(request);
     nlohmann::json reply;
     if (jsonRequest["type"] == Requests::Auth) {
@@ -51,5 +51,5 @@ std::pair<Requests, nlohmann::json> RequestHandler::handle(const std::string &re
                 {"data",   Replies::Unknown::Unknown}
         };
     }
-    return {jsonRequest["type"], reply};
+    return {jsonRequest, reply};
 }

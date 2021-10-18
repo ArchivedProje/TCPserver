@@ -5,6 +5,7 @@
 #include <Logger.h>
 #include <nlohmann/json.hpp>
 #include <algorithm>
+#include <iostream>
 
 HandleConnection::HandleConnection(boost::asio::io_service &io_service) : socket_(
         std::make_shared<tcp::socket>(io_service)) {}
@@ -26,14 +27,15 @@ void HandleConnection::getMessage() {
                                               Logger::log("Message - " + sData, __FILE__, __LINE__);
                                               Logger::log("Handling new message", __FILE__, __LINE__);
                                               auto res = RequestHandler::handle(sData);
-                                              if (res.first == Requests::Disconnect) {
+                                              if (res.first["type"] == Requests::Disconnect) {
                                                   usersSockets_.erase(std::find(usersSockets_.begin(), usersSockets_.end(), socket_));
-                                              } else if (res.first == Requests::Msg) {
+                                              } else if (res.first["type"] == Requests::Msg) {
                                                   for (const auto& socket : usersSockets_) {
                                                       if (socket != socket_) {
-                                                          sendMessage(socket, res.second.dump());
+                                                          sendMessage(socket, res.first.dump());
                                                       }
                                                   }
+                                                  getMessage();
                                               } else {
                                                   sendMessage(res.second.dump());
                                               }
@@ -65,7 +67,7 @@ std::shared_ptr<tcp::socket> HandleConnection::getSocket() const {
 
 void HandleConnection::sendMessage(const std::shared_ptr<tcp::socket>& socket, const std::string &msg) {
     auto self(shared_from_this());
-    boost::asio::async_write(*socket_, boost::asio::buffer(msg + '\n', msg.size() + 1),
+    boost::asio::async_write(*socket, boost::asio::buffer(msg + '\n', msg.size() + 1),
                              [this, self, msg](boost::system::error_code ec, std::size_t /*length*/) {
                                  if (!ec) {
                                      Logger::log("Message successfully sent", __FILE__, __LINE__);
