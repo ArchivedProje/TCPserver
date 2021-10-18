@@ -6,17 +6,21 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <vector>
+#include <map>
+#include <string>
 
 using boost::asio::ip::tcp;
 
-static std::vector<std::shared_ptr<tcp::socket>> usersSockets_;
+static std::map<std::string, std::shared_ptr<tcp::socket>> usersSockets_;
 
 class HandleConnection : public boost::enable_shared_from_this<HandleConnection> {
 private:
     std::shared_ptr<tcp::socket> socket_;
     boost::asio::ip::address ip_;
     boost::asio::streambuf data_;
+
+    static void deleteUser(std::shared_ptr<tcp::socket>& socket);
+
 public:
     using pointer = boost::shared_ptr<HandleConnection>;
 

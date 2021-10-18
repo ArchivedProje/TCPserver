@@ -23,6 +23,7 @@ private:
 
 public:
     explicit Server(const std::shared_ptr<boost::asio::io_service>& ioService);
+
 };
 
 #endif //TCPSERVER_SERVER_H
