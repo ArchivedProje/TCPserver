@@ -21,7 +21,15 @@ private:
 
     static void deleteUser(std::shared_ptr<tcp::socket>& socket);
 
+    void sendMessage(const std::string &msg);
+
+    void sendMessage(const std::shared_ptr<tcp::socket>& socket, const std::string& msg);
+
+    void getMessage();
+
 public:
+    static void sendAll(const std::string& msg);
+
     using pointer = boost::shared_ptr<HandleConnection>;
 
     explicit HandleConnection(boost::asio::io_service &io_service);
@@ -29,12 +37,6 @@ public:
     static pointer create(boost::asio::io_service &io_service);
 
     void start();
-
-    void sendMessage(const std::string &msg);
-
-    void sendMessage(const std::shared_ptr<tcp::socket>& socket, const std::string& msg);
-
-    void getMessage();
 
     std::shared_ptr<tcp::socket> getSocket() const;
 };

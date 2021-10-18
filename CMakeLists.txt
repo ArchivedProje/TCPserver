@@ -37,6 +37,15 @@ target_include_directories(RequestHandling PUBLIC
         $<INSTALL_INTERFACE:include>
         )
 
+add_library(ConsoleHandling STATIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/ConsoleHandling/sources/ConsoleHandler.cpp
+        )
+
+target_include_directories(ConsoleHandling PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ConsoleHandling/include>
+        $<INSTALL_INTERFACE:include>
+        )
+
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Python DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 hunter_add_package(nlohmann_json)
@@ -49,6 +58,8 @@ target_link_libraries(RequestHandling Logger NetworkCommunication nlohmann_json:
 
 target_link_libraries(Network Logger RequestHandling Boost::system)
 
+target_link_libraries(ConsoleHandling Network nlohmann_json::nlohmann_json)
+
 add_executable(demo demo/main.cpp)
 
-target_link_libraries(demo Network)
+target_link_libraries(demo Network ConsoleHandling)

@@ -24,6 +24,19 @@ void HandleConnection::deleteUser(std::shared_ptr<tcp::socket> &socket) {
     }
 }
 
+void HandleConnection::sendAll(const std::string &msg) {
+    for (const auto& user : usersSockets_) {
+        boost::asio::async_write(*user.second, boost::asio::buffer(msg + '\n', msg.size() + 1),
+                                 [msg](boost::system::error_code ec, std::size_t /*length*/) {
+                                     if (!ec) {
+                                         Logger::log("Message successfully sent", __FILE__, __LINE__);
+                                     } else {
+                                         Logger::log("Failed send message", __FILE__, __LINE__);
+                                     }
+                                 });
+    }
+}
+
 void HandleConnection::getMessage() {
     Logger::log("Getting new message", __FILE__, __LINE__);
     auto self(shared_from_this());
@@ -35,7 +48,7 @@ void HandleConnection::getMessage() {
                                           std::getline(ss, sData);
                                           if (sData != "\"null\"") {
                                               Logger::log("Message - " + sData, __FILE__, __LINE__);
-                                              Logger::log("Handling new message", __FILE__, __LINE__);
+                                              Logger::log("RequestHandling new message", __FILE__, __LINE__);
                                               auto res = RequestHandler::handle(sData);
                                               if (res.first["type"] == Requests::Auth &&
                                                   res.second["data"] == Replies::Auth::Successful) {
@@ -81,7 +94,7 @@ void HandleConnection::sendMessage(const std::shared_ptr<tcp::socket> &socket, c
     if (!msg.empty()) {
         auto self(shared_from_this());
         boost::asio::async_write(*socket, boost::asio::buffer(msg + '\n', msg.size() + 1),
-                                 [this, self, msg](boost::system::error_code ec, std::size_t /*length*/) {
+                                 [self, msg](boost::system::error_code ec, std::size_t /*length*/) {
                                      if (!ec) {
                                          Logger::log("Message successfully sent", __FILE__, __LINE__);
                                      } else {
