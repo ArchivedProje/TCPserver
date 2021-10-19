@@ -24,8 +24,9 @@ std::string RequestHandler::exec(const char *cmd) {
 std::pair<nlohmann::json, nlohmann::json> RequestHandler::handle(const std::string &request) {
     nlohmann::json jsonRequest = nlohmann::json::parse(request);
     nlohmann::json reply;
+    std::string cmd;
     if (jsonRequest["type"] == Requests::Auth) {
-        std::string cmd = "python3 Python/MYSQLmain.py AUTH " + jsonRequest["data"]["login"].get<std::string>() + " " +
+        cmd = "python3 Python/MYSQLmain.py AUTH " + jsonRequest["data"]["login"].get<std::string>() + " " +
                           jsonRequest["data"]["password"].get<std::string>();
         if (RequestHandler::exec(cmd.c_str()) == "True") {
             reply = {
@@ -33,6 +34,8 @@ std::pair<nlohmann::json, nlohmann::json> RequestHandler::handle(const std::stri
                     {"type",   Requests::Auth},
                     {"data",   Replies::Auth::Successful}
             };
+            cmd = "python3 Python/MYSQLmain.py CONNECTED " + jsonRequest["sender"].get<std::string>();
+            RequestHandler::exec(cmd.c_str());
         } else {
             reply = {
                     {"sender", "server"},
@@ -43,6 +46,8 @@ std::pair<nlohmann::json, nlohmann::json> RequestHandler::handle(const std::stri
     } else if (jsonRequest["type"] == Requests::Msg) {
         Logger::log("New message from " + jsonRequest["sender"].get<std::string>() + " Message: " + jsonRequest["data"].get<std::string>(), __FILE__, __LINE__);
     } else if (jsonRequest["type"] == Requests::Disconnect) {
+        cmd = "python3 Python/MYSQLmain.py DISCONNECTED " + jsonRequest["sender"].get<std::string>();
+        RequestHandler::exec(cmd.c_str());
         Logger::log("Person disconnected", __FILE__, __LINE__);
     } else {
         reply = {
