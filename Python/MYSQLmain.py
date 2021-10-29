@@ -18,6 +18,8 @@ try:
             dbInteraction.set_connected(connection.cursor(), argv[2])
         elif argv[1] == "DISCONNECTED":
             dbInteraction.set_disconnected(connection.cursor(), argv[2])
+        elif argv[1] == "USERS":
+            print(dbInteraction.get_users(connection.cursor(), argv[2]))
         connection.commit()
 except Error as e:
     print(e)
