@@ -13,6 +13,8 @@ private:
 
 public:
     static std::pair<nlohmann::json, nlohmann::json> handle(const std::string &request);
+
+    static void setDisconnected(const std::string& name);
 };
 
 #endif //TCPSERVER_REQUESTHANDLER_H

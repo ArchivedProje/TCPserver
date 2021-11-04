@@ -5,8 +5,8 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <memory>
 #include <HandleConnection.h>
+#include <memory>
 
 using boost::asio::ip::tcp;
 
@@ -23,7 +23,6 @@ private:
 
 public:
     explicit Server(const std::shared_ptr<boost::asio::io_service>& ioService);
-
 };
 
 #endif //TCPSERVER_SERVER_H

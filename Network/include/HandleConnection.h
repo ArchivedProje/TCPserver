@@ -7,11 +7,13 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
+#include <set>
 #include <string>
 
 using boost::asio::ip::tcp;
 
 static std::map<std::string, std::shared_ptr<tcp::socket>> usersSockets_;
+static std::map<std::shared_ptr<tcp::socket>, std::string> socketsIps_;
 
 class HandleConnection : public boost::enable_shared_from_this<HandleConnection> {
 private:

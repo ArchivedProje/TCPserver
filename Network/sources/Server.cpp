@@ -4,6 +4,7 @@
 #include <Logger.h>
 #include <RequestHandler.h>
 
+
 void Server::startAccept() {
     Logger::log("Listening for new connection", __FILE__, __LINE__);
     HandleConnection::pointer connection = HandleConnection::create(*ioService_);
